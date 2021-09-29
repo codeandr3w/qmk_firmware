@@ -39,28 +39,26 @@ static bool my_cool_effect(effect_params_t* params) {
     if (v>255)
     	v = 255;
     unsigned char vh=v, vm=(v>>1);
-    unsigned char uh=rgb_matrix_config.hsv.h>>3;
+    unsigned char uh=rgb_matrix_config.hsv.h>>1;
     if (cost > vm)
         cost = vm;
-    if (uh>vh)
-    	uh=vh;
+    if (uh*2>vh)
+    	uh=vh>>1;
 //    unsigned char um=uh>>1;
-    unsigned char z=0xFF-rgb_matrix_config.hsv.s;
+    unsigned char z=(0xFF-rgb_matrix_config.hsv.s)>>2;
     if (z>vh) 
     	z=vh;
-    if (uh<z)
-    	uh=z;
     unsigned char r=vm-cost, g=vm, b=vm;
     if (type==KCOL_MOD) {
-        r=z; g=vh-uh; b=uh;
+        r=uh; g=vh-uh; b=z;
     } else if (type==KCOL_LAYER) {
     	r=z; g=uh; b=vh;
     } else if (type==KCOL_SYMBOL) {
-    	r=vh; g=vh; b=vh;
+    	r=vh-cost; g=vh; b=vh;
     } else if (type==KCOL_FN) {
-    	r=vh; b=uh; g=z;
+    	r=vh-uh; b=uh; g=z;
     } else if (type==KCOL_NUM) {
-    	r=z; b=vh;
+    	r=z; g=vm-cost; b=vh-uh*2;
     } else if (type==KCOL_BLANK) {
         r=0;g=0;b=0;
     }
