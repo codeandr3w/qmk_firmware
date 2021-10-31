@@ -21,6 +21,11 @@ extern bool adafruit_ble_enable_keyboard(void);
 /* Query to see if the BLE module is connected */
 extern bool adafruit_ble_query_is_connected(void);
 
+#ifdef BLE_BATTERY_REPORT
+/* set batlevel (grid)*/
+extern bool adafruit_ble_send_batlevel(uint8_t batlevel);
+#endif
+
 /* Returns true if we believe that the BLE module is connected.
  * This uses our cached understanding that is maintained by
  * calling ble_task() periodically. */
@@ -53,6 +58,8 @@ extern uint32_t adafruit_ble_read_battery_voltage(void);
 
 extern bool adafruit_ble_set_mode_leds(bool on);
 extern bool adafruit_ble_set_power_level(int8_t level);
+extern bool adafruit_ble_switch_connection(void);
+extern bool adafruit_ble_change_profile(int profile);
 
 #ifdef __cplusplus
 }

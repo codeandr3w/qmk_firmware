@@ -83,6 +83,9 @@ enum queue_type {
     QTConsumer,   // 16-bit key code
 #ifdef MOUSE_ENABLE
     QTMouseMove,  // 4-byte mouse report
+#endif    
+#ifdef BLE_BATTERY_REPORT
+    QTBatteryReport,//(grid)battery level report
 #endif
 };
 
@@ -100,6 +103,9 @@ struct queue_item {
             int8_t  x, y, scroll, pan;
             uint8_t buttons;
         } mousemove;
+#ifdef BLE_BATTERY_REPORT
+        uint8_t batterylevel; //(grid)battery level report
+#endif
     };
 };
 
@@ -142,6 +148,9 @@ enum ble_system_event_bits {
 
 static bool at_command(const char *cmd, char *resp, uint16_t resplen, bool verbose, uint16_t timeout = SdepTimeout);
 static bool at_command_P(const char *cmd, char *resp, uint16_t resplen, bool verbose = false);
+
+// This stores the address of a device that shouldn't be allowed to reconnect when switching device
+static char blocked_device [18] = "";
 
 // Send a single SDEP packet
 static bool sdep_send_pkt(const struct sdep_msg *msg, uint16_t timeout) {
@@ -454,10 +463,26 @@ bool adafruit_ble_enable_keyboard(void) {
     // Reset the device so that it picks up the above changes
     static const char kATZ[] PROGMEM = "ATZ";
 
-    // Turn down the power level a bit
+#ifdef BLE_BATTERY_REPORT
+    //enable batservice (grid)
+    static const char kGATTClr[] PROGMEM = "AT+GATTCLEAR";
+    static const char kBatService[] PROGMEM = "AT+GATTADDSERVICE=UUID=0x180F";
+    static const char kBatLevel[] PROGMEM = "AT+GATTADDCHAR=UUID=0x2A19,PROPERTIES=0x12,MIN_LEN=1,VALUE=50";
+    static const char kFctrst[] PROGMEM = "AT+FACTORYRESET";
+#endif
+#ifndef MAX_PWR
     static const char  kPower[] PROGMEM             = "AT+BLEPOWERLEVEL=-12";
+#else
+    static const char  kPower[] PROGMEM             = "AT+BLEPOWERLEVEL=4"; // turn max power(grid)    
+#endif
     static PGM_P const configure_commands[] PROGMEM = {
-        kEcho, kGapIntervals, kGapDevName, kHidEnOn, kPower, kATZ,
+        kEcho, kGapIntervals, kGapDevName, kHidEnOn, kPower,
+#ifdef BLE_BATTERY_REPORT
+        kGATTClr, //(grid) add batservice
+        kBatService, //(grid)
+        kBatLevel,//(grid)
+#endif
+        kATZ, 
     };
 
     uint8_t i;
@@ -488,6 +513,20 @@ static void set_connected(bool connected) {
             dprint("BLE disconnected\n");
         }
         state.is_connected = connected;
+        
+        if (connected && blocked_device [0]) {
+            /* Block blocked_device from reconnecting */
+            /* Doesn't work:
+            char new_device [sizeof(blocked_device)];
+            if (at_command_P(PSTR("AT+BLEGETPEERADDR"), new_device, sizeof(new_device))) {
+                if (strncmp (new_device, blocked_device, sizeof (blocked_device)-1) == 0) {
+                    // the blocked device reconnected, so force a disconnection
+                    at_command("AT+GAPDISCONNECT", NULL, 0, false);
+                    state.is_connected = false; // force a re-check
+                }
+            }
+            */
+        }
 
         // TODO: if modifiers are down on the USB interface and
         // we cut over to BLE or vice versa, they will remain stuck.
@@ -584,6 +623,14 @@ static bool process_queue_item(struct queue_item *item, uint16_t timeout) {
             snprintf(cmdbuf, sizeof(cmdbuf), fmtbuf, item->consumer);
             return at_command(cmdbuf, NULL, 0, true, timeout);
 
+#ifdef BLE_BATTERY_REPORT
+        //(grid) battery report
+        case QTBatteryReport:
+            strcpy_P(fmtbuf, PSTR("AT+GATTCHAR=1,%d"));
+            snprintf(cmdbuf, sizeof(cmdbuf), fmtbuf, item->batterylevel);
+            return at_command(cmdbuf, NULL, 0, true, timeout);
+#endif
+
 #ifdef MOUSE_ENABLE
         case QTMouseMove:
             strcpy_P(fmtbuf, PSTR("AT+BLEHIDMOUSEMOVE=%d,%d,%d,%d"));
@@ -642,7 +689,7 @@ void adafruit_ble_send_keys(uint8_t hid_modifier_mask, uint8_t *keys, uint8_t nk
 
         nkeys -= 6;
         keys += 6;
-    }
+    }    
 }
 
 void adafruit_ble_send_consumer_key(uint16_t usage) {
@@ -653,7 +700,7 @@ void adafruit_ble_send_consumer_key(uint16_t usage) {
 
     while (!send_buf.enqueue(item)) {
         send_buf_send_one();
-    }
+    }    
 }
 
 #ifdef MOUSE_ENABLE
@@ -670,6 +717,23 @@ void adafruit_ble_send_mouse_move(int8_t x, int8_t y, int8_t scroll, int8_t pan,
     while (!send_buf.enqueue(item)) {
         send_buf_send_one();
     }
+}
+#endif
+
+#ifdef BLE_BATTERY_REPORT
+//(grid) function to set bat level
+bool adafruit_ble_send_batlevel(uint8_t batlevel) {
+  
+  struct queue_item item;
+
+  item.queue_type = QTBatteryReport;
+  item.batterylevel = batlevel;
+  item.added = timer_read();
+
+  while (!send_buf.enqueue(item)) {
+    send_buf_send_one();
+  }
+  return true;
 }
 #endif
 
@@ -698,4 +762,22 @@ bool adafruit_ble_set_power_level(int8_t level) {
     }
     snprintf(cmd, sizeof(cmd), "AT+BLEPOWERLEVEL=%d", level);
     return at_command(cmd, NULL, 0, false);
+}
+
+bool adafruit_ble_switch_connection() {
+    return at_command("AT+GAPDISCONNECT", NULL, 0, false);
+}
+
+bool adafruit_ble_change_profile(int profile) {
+    // Change the profile name: doesn't change the connection, unfortunately
+    // need to change the BD_ADDR, somehow
+    if (profile == 0) {
+        at_command ("AT+GAPDEVNAME=" STR(PRODUCT), NULL, 0, false);
+    } else {
+        char command[] = "AT+GAPDEVNAME=" STR(PRODUCT) "-1";
+        command [sizeof(command)-2] = '0' + profile;
+        at_command (command, NULL, 0, false);
+    }
+    at_command ("ATZ", NULL, 0, false);
+    return at_command("AT+GAPDISCONNECT", NULL, 0, false);
 }

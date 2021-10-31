@@ -17,37 +17,203 @@
 #include QMK_KEYBOARD_H
 
 enum layers {
-    _MAIN,
-    _RAISE,
-    _LOWER,
+    _ALPHA,   //  this layer matches the symbols on the keycaps
+    _EDIT,    //  this layer is for editing it has cursor keys and natural shift placement
+    _QAZ,     // QAZ with symbols on the right
+    _FUNCTION,//  this layer has function keys and numpad
+    _SYMBOLS, //  this layer has all the symbols on it
+    _NUMPAD,  //  this layer has a numpad
+    _MOUSE,   //  this layer has mouse keys and media keys
+    _FNL,     //  this layer is always used with the left bottom long key
+    _ALPHAH   // duplicate of Alpha for overlaying alpha on top
 };
 
-// Readability keycodes
-#define LOWER   MO(_LOWER)
-#define RAISE   MO(_RAISE)
+enum KCOL_KEYTYPES {
+        KCOL_ALPHA,
+        KCOL_NUM,
+        KCOL_MOD,
+        KCOL_LAYER,
+        KCOL_SYMBOL,
+        KCOL_BLANK,
+        KCOL_FN
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
-  [_MAIN] = LAYOUT(
-    KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
-    KC_ESC,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN,
-    KC_LSHIFT,KC_LSHIFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM,  KC_UP, KC_ENT ,
-    RGB_TOG, KC_LCTL, KC_LALT,   LOWER,   KC_SPC,   KC_SPC, RAISE,  KC_LEFT,   KC_DOWN, KC_RIGHT
+  [_ALPHA] = LAYOUT(
+    KC_GRV,    KC_Q,      KC_W,    KC_E,    KC_R,     KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
+    MT(MOD_LCTL,KC_TAB),KC_A,KC_S, KC_D,    KC_F,     KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_ENT,
+    MT(MOD_LSFT,KC_1),KC_2,KC_Z,   KC_X,    KC_C,     KC_V,    KC_B,    KC_N,    KC_M,   KC_COMM, KC_9,    MT(MOD_RSFT,KC_0),
+    KC_3,MT(MOD_LGUI,KC_4),MT(MOD_LALT,KC_5),LT(_FNL,MOD_SCOLON),MT(MOD_LSFT,KC_SPC),KC_SPC,LT(_SYMBOLS,KC_QUOTE),MT(MOD_RALT,KC_6),KC_7,KC_8
   ),
 
-  [_RAISE] = LAYOUT(
-  KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR,    KC_ASTR,    KC_LPRN, KC_RPRN, KC_BSPC,
-  KC_DEL,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_UNDS,    KC_PLUS,    KC_LCBR, KC_RCBR, 
-  RGB_MOD, KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  S(KC_NUHS), S(KC_NUBS), KC_HOME, KC_END,  _______,
-  RESET,   _______, _______, _______, _______, _______, _______, _______,    KC_MNXT,    KC_VOLD 
+  [_ALPHAH] = LAYOUT(
+    KC_GRV,    KC_Q,      KC_W,    KC_E,    KC_R,     KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
+    MT(MOD_LCTL,KC_TAB),   KC_A,      KC_S,    KC_D,    KC_F,     KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_ENT,
+    MT(MOD_LSFT,KC_1),KC_2,KC_Z,    KC_X,    KC_C,     KC_V,    KC_B,    KC_N,    KC_M,   KC_COMM, KC_9,    MT(MOD_RSFT,KC_0),
+    KC_3,MT(MOD_LGUI,KC_4),MT(MOD_LALT,KC_5),MO(_FNL),MT(MOD_LSFT,KC_SPC),KC_SPC,MO(_SYMBOLS),MT(MOD_RALT,KC_6),KC_7,KC_8
   ),
 
-  [_LOWER] = LAYOUT(
- KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC,
- KC_DEL,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_MINS, KC_EQL,  KC_LBRC, KC_RBRC,
- _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_NUHS, KC_NUBS, KC_PGUP, KC_PGDN, _______,
- _______, _______, _______, _______, _______, _______, _______, _______, KC_MNXT, KC_VOLD
+  [_FNL] = LAYOUT(
+    KC_ESC,  TO(_QAZ),XXXXXXX, TO(_EDIT), XXXXXXX, KC_HOME,   KC_PGUP,XXXXXXX,  XXXXXXX,   KC_LBRC,  KC_RBRC, KC_DEL,
+    KC_LCTL, RGB_SPI, TO(_SYMBOLS), TO(_ALPHA),OSL(_FUNCTION),KC_END, KC_PGDN,  XXXXXXX,KC_SCOLON,KC_QUOTE, KC_NUHS,
+    _______, XXXXXXX, RGB_TOG, RGB_MOD, RGB_HUD,  RGB_VAD, RGB_SAD, TO(_NUMPAD),TO(_MOUSE),XXXXXXX,  KC_UP,   KC_SLSH,
+    OSL(_ALPHAH),OSM(MOD_LGUI),OSM(MOD_LALT),_______, KC_LSHIFT,KC_SPC, OSM(MOD_RALT),      KC_LEFT,  KC_DOWN, KC_RIGHT 
+  ),
+
+  [_FUNCTION] = LAYOUT(
+    KC_ESC,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_INS,  XXXXXXX, KC_PSCR,KC_BSPC,
+    KC_LCTL, XXXXXXX, KC_SLCK, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_ENT,
+    KC_F1,   KC_F2,   KC_F11,  KC_F12,  KC_CAPS, XXXXXXX, XXXXXXX, XXXXXXX, KC_APP,  XXXXXXX, KC_9,   KC_0,
+    KC_F3,   KC_F4,   KC_F5,   KC_LALT, KC_LSHIFT,KC_SPC, KC_RALT,                   KC_6,    KC_7,   KC_8
+ ),
+ 
+  [_MOUSE] = LAYOUT(
+    KC_ESC,  XXXXXXX, XXXXXXX, XXXXXXX, KC_BRIU, XXXXXXX, XXXXXXX, KC_VOLU, KC_MPRV, KC_MNXT, KC_MPLY, XXXXXXX,
+    KC_LCTL, KC_WH_U, XXXXXXX, XXXXXXX, KC_BRID, XXXXXXX, XXXXXXX, KC_VOLD, XXXXXXX, XXXXXXX, KC_ENT,
+    KC_LSFT, XXXXXXX, KC_WH_D, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_MUTE, XXXXXXX, KC_MS_U, XXXXXXX,
+    XXXXXXX, KC_LGUI, KC_LALT, MO(_FNL),KC_BTN1, KC_BTN2, MO(_SYMBOLS),                  KC_MS_L, KC_MS_D, KC_MS_R
+ ),
+ 
+  [_NUMPAD] = LAYOUT(
+    KC_ESC,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_PSLS, KC_KP_7, KC_KP_8, KC_KP_9, KC_PPLS, KC_BSPC,
+    KC_LCTL, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_PAST, KC_KP_4, KC_KP_5, KC_KP_6, KC_PMNS, KC_PENT,
+    KC_1,    KC_2,    XXXXXXX, KC_NLCK, KC_CALC, KC_KP_0, KC_KP_1, KC_KP_2, KC_KP_3, KC_PDOT, KC_9,    KC_0,
+    KC_3,    KC_4,    KC_5,    MO(_FNL),KC_LSHIFT,KC_SPC, MO(_SYMBOLS),                  KC_6,    KC_7,    KC_8
+ ),
+ 
+  [_SYMBOLS] = LAYOUT(
+    KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,
+    S(KC_1),   S(KC_2),   S(KC_3),   S(KC_4),   S(KC_5),   S(KC_6),   S(KC_7),       S(KC_8), S(KC_9), S(KC_0), S(KC_MINS),
+    KC_LSHIFT,KC_NUBS,  XXXXXXX,   XXXXXXX,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, KC_DOT, KC_SLSH,
+    KC_NUHS,KC_LGUI,KC_LALT, MO(_FNL),KC_LSHIFT,KC_SPC, MO(_SYMBOLS),                          XXXXXXX,S(KC_DOT),S(KC_SLSH)
+ ),
+ 
+  [_QAZ] = LAYOUT(
+    KC_Q,      KC_W,    KC_E,    KC_R,     KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC,
+    MT(MOD_LCTL,KC_A),KC_S,KC_D, KC_F,     KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_ENT,
+    MT(MOD_LSFT,KC_NUBS),KC_Z,KC_X,KC_C,   KC_V,    KC_B,    KC_N,    KC_M,   KC_COMM,  KC_DOT,  KC_UP,   MT(MOD_RSFT,KC_SLSH),
+    KC_NUHS,KC_LGUI,KC_LALT,MO(_FNL),MT(MOD_LSFT,KC_SPC),KC_SPC,MO(_SYMBOLS),KC_LEFT,  KC_DOWN, KC_RIGHT
+  ),
+
+  [_EDIT] = LAYOUT(
+    LT(_ALPHAH,KC_GRV),KC_Q,KC_W,KC_E,   KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
+    MT(MOD_LCTL,KC_TAB),  KC_A,   KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_ENT,
+    KC_LSHIFT,KC_NUBS,KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMMA,KC_UP,   MT(MOD_RSFT,KC_SLASH),
+    KC_NUHS,KC_LGUI,KC_LALT,LT(_FNL,KC_SCOLON),KC_SPC,KC_SPC,  LT(_SYMBOLS,KC_QUOTE),KC_LEFT, KC_DOWN, KC_RIGHT
  )
-
 };
 
+static enum layers display_layer=_ALPHA;
+static int layercount=0;
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+//  rgb_matrix_mode (RGB_MATRIX_CUSTOM_my_cool_effect);
+  display_layer=get_highest_layer(state);
+  layercount++;
+  return state;
+}
+
+static enum KCOL_KEYTYPES alphatypes [] = {
+  KCOL_SYMBOL, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_MOD,
+  KCOL_MOD, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_MOD,
+  KCOL_NUM, KCOL_NUM, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_SYMBOL, KCOL_NUM, KCOL_NUM,
+  KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_LAYER, KCOL_ALPHA, KCOL_ALPHA, KCOL_LAYER, KCOL_NUM, KCOL_NUM, KCOL_NUM
+  };
+  
+static enum KCOL_KEYTYPES fn1types [] = {
+  KCOL_FN, KCOL_LAYER, KCOL_BLANK, KCOL_LAYER, KCOL_BLANK, KCOL_MOD, KCOL_MOD, KCOL_BLANK, KCOL_BLANK, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_MOD,
+  KCOL_MOD, KCOL_BLANK, KCOL_LAYER, KCOL_LAYER, KCOL_LAYER, KCOL_MOD, KCOL_MOD, KCOL_BLANK, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_SYMBOL,
+  KCOL_MOD, KCOL_BLANK, KCOL_FN, KCOL_FN, KCOL_FN, KCOL_FN, KCOL_FN, KCOL_LAYER, KCOL_LAYER, KCOL_BLANK, KCOL_FN, KCOL_BLANK,
+  KCOL_LAYER, KCOL_MOD, KCOL_MOD, KCOL_LAYER, KCOL_MOD, KCOL_ALPHA, KCOL_MOD, KCOL_FN, KCOL_FN, KCOL_FN
+  };
+  
+static enum KCOL_KEYTYPES edittypes [] = {
+  KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_MOD,
+  KCOL_MOD, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_MOD,
+  KCOL_MOD, KCOL_SYMBOL, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_SYMBOL, KCOL_FN, KCOL_SYMBOL,
+  KCOL_SYMBOL, KCOL_MOD, KCOL_MOD, KCOL_LAYER, KCOL_ALPHA, KCOL_ALPHA, KCOL_LAYER, KCOL_FN, KCOL_FN, KCOL_FN
+  };
+  
+static enum KCOL_KEYTYPES qaztypes [] = {
+  KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_SYMBOL, KCOL_SYMBOL,
+  KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_SYMBOL, KCOL_MOD,
+  KCOL_MOD, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_FN, KCOL_SYMBOL,
+  KCOL_SYMBOL, KCOL_MOD, KCOL_MOD, KCOL_LAYER, KCOL_ALPHA, KCOL_ALPHA, KCOL_LAYER, KCOL_FN, KCOL_FN, KCOL_FN
+  };
+  
+static enum KCOL_KEYTYPES functiontypes [] = {
+  KCOL_FN, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_MOD, KCOL_BLANK, KCOL_MOD, KCOL_MOD,
+  KCOL_MOD, KCOL_BLANK, KCOL_MOD, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_MOD,
+  KCOL_FN, KCOL_FN, KCOL_FN, KCOL_FN, KCOL_MOD, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_MOD, KCOL_BLANK, KCOL_FN, KCOL_FN,
+  KCOL_FN, KCOL_FN, KCOL_FN, KCOL_MOD, KCOL_MOD, KCOL_ALPHA, KCOL_MOD, KCOL_FN, KCOL_FN, KCOL_FN
+  };
+  
+static enum KCOL_KEYTYPES mousetypes [] = {
+  KCOL_FN, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_FN, KCOL_BLANK, KCOL_BLANK, KCOL_FN, KCOL_FN, KCOL_FN, KCOL_FN, KCOL_BLANK,
+  KCOL_MOD, KCOL_FN, KCOL_BLANK, KCOL_BLANK, KCOL_FN, KCOL_BLANK, KCOL_BLANK, KCOL_FN, KCOL_BLANK, KCOL_BLANK, KCOL_MOD,
+  KCOL_BLANK, KCOL_BLANK, KCOL_FN, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_FN, KCOL_BLANK, KCOL_FN, KCOL_BLANK,
+  KCOL_BLANK, KCOL_FN, KCOL_FN, KCOL_LAYER, KCOL_FN, KCOL_FN, KCOL_LAYER, KCOL_FN, KCOL_FN, KCOL_FN
+  };
+  
+static enum KCOL_KEYTYPES numpadtypes [] = {
+  KCOL_FN, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_SYMBOL, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_SYMBOL, KCOL_MOD,
+  KCOL_MOD, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_SYMBOL, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_SYMBOL, KCOL_MOD,
+  KCOL_NUM, KCOL_NUM, KCOL_BLANK, KCOL_MOD, KCOL_FN, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_SYMBOL, KCOL_NUM, KCOL_NUM,
+  KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_LAYER, KCOL_MOD, KCOL_ALPHA, KCOL_LAYER, KCOL_NUM, KCOL_NUM, KCOL_NUM
+  };
+  
+static enum KCOL_KEYTYPES symbolstypes [] = {
+  KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_SYMBOL, KCOL_SYMBOL,
+  KCOL_SYMBOL, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_SYMBOL, KCOL_SYMBOL,
+  KCOL_MOD, KCOL_SYMBOL, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_BLANK, KCOL_SYMBOL, KCOL_SYMBOL,
+  KCOL_SYMBOL, KCOL_MOD, KCOL_MOD, KCOL_LAYER, KCOL_ALPHA, KCOL_ALPHA, KCOL_LAYER, KCOL_BLANK, KCOL_SYMBOL, KCOL_SYMBOL
+  };
+  
+enum KCOL_KEYTYPES get_colour_keytype (int key) {
+  key = key-10;
+  if (key<0 || key>=45)
+    return KCOL_BLANK;
+  enum KCOL_KEYTYPES *ptypes = alphatypes;
+  if (display_layer==_FNL)
+    ptypes = fn1types;
+  if (display_layer==_EDIT)
+    ptypes = edittypes;  
+  if (display_layer==_SYMBOLS)
+    ptypes = symbolstypes;  
+  if (display_layer==_NUMPAD)
+    ptypes = numpadtypes;
+  if (display_layer==_MOUSE)
+    ptypes = mousetypes;
+  if (display_layer==_FUNCTION)
+    ptypes = functiontypes;  
+  if (display_layer==_QAZ)
+    ptypes = qaztypes;  
+  return ptypes[key];
+ }
+ 
+void rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    if (rgb_matrix_config.mode==RGB_MATRIX_CUSTOM_my_cool_effect) 
+      return;
+    int v=rgb_matrix_config.hsv.v;
+    for (uint8_t i = led_min; i <= led_max; i++) {
+      enum KCOL_KEYTYPES type = get_colour_keytype (i);
+      if (type != KCOL_ALPHA) {
+        unsigned char r=0, g=0, b=0;
+        if (type==KCOL_MOD) {
+          r=0; g=v; b=0;
+        } else if (type==KCOL_SYMBOL) {
+          r=v; g=v; b=v;
+          continue;
+        } else if (type==KCOL_NUM) {
+          g=v; b=v;
+        } else if (type==KCOL_LAYER) {
+          g=0; b=v;
+        } else if (type==KCOL_FN) {
+          r=v;
+        }
+          
+        rgb_matrix_set_color(i, r, g, b);
+      }
+    }
+}
