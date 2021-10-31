@@ -58,7 +58,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_ESC,  TO(_QAZ),XXXXXXX, TO(_EDIT), XXXXXXX, KC_HOME,   KC_PGUP,XXXXXXX,  XXXXXXX,   KC_LBRC,  KC_RBRC, KC_DEL,
     KC_LCTL, RGB_SPI, TO(_SYMBOLS), TO(_ALPHA),OSL(_FUNCTION),KC_END, KC_PGDN,  XXXXXXX,KC_SCOLON,KC_QUOTE, KC_NUHS,
     _______, XXXXXXX, RGB_TOG, RGB_MOD, RGB_HUD,  RGB_VAD, RGB_SAD, TO(_NUMPAD),TO(_MOUSE),XXXXXXX,  KC_UP,   KC_SLSH,
-    TO(_ALPHA),OSM(MOD_LGUI),OSM(MOD_LALT),_______, KC_LSHIFT,KC_SPC, OSM(MOD_RALT),      KC_LEFT,  KC_DOWN, KC_RIGHT 
+    OSL(_ALPHAH),OSM(MOD_LGUI),OSM(MOD_LALT),_______, KC_LSHIFT,KC_SPC, OSM(MOD_RALT),      KC_LEFT,  KC_DOWN, KC_RIGHT 
   ),
 
   [_FUNCTION] = LAYOUT(
@@ -115,7 +115,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 static enum KCOL_KEYTYPES alphatypes [] = {
-  KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_MOD,
+  KCOL_SYMBOL, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_MOD,
   KCOL_MOD, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_MOD,
   KCOL_NUM, KCOL_NUM, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_ALPHA, KCOL_SYMBOL, KCOL_NUM, KCOL_NUM,
   KCOL_NUM, KCOL_NUM, KCOL_NUM, KCOL_LAYER, KCOL_ALPHA, KCOL_ALPHA, KCOL_LAYER, KCOL_NUM, KCOL_NUM, KCOL_NUM
@@ -191,3 +191,29 @@ enum KCOL_KEYTYPES get_colour_keytype (int key) {
     ptypes = qaztypes;  
   return ptypes[key];
  }
+ 
+void rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    if (rgb_matrix_config.mode==RGB_MATRIX_CUSTOM_my_cool_effect) 
+      return;
+    int v=rgb_matrix_config.hsv.v;
+    for (uint8_t i = led_min; i <= led_max; i++) {
+      enum KCOL_KEYTYPES type = get_colour_keytype (i);
+      if (type != KCOL_ALPHA) {
+        unsigned char r=0, g=0, b=0;
+        if (type==KCOL_MOD) {
+          r=0; g=v; b=0;
+        } else if (type==KCOL_SYMBOL) {
+          r=v; g=v; b=v;
+          continue;
+        } else if (type==KCOL_NUM) {
+          g=v; b=v;
+        } else if (type==KCOL_LAYER) {
+          g=0; b=v;
+        } else if (type==KCOL_FN) {
+          r=v;
+        }
+          
+        rgb_matrix_set_color(i, r, g, b);
+      }
+    }
+}
