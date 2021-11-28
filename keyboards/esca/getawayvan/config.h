@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_ROW_PINS { A9, A8, A3, A5 }
 #define DIODE_DIRECTION COL2ROW
 
-#define BACKLIGHT_LEVELS 6
+//#define BACKLIGHT_LEVELS 6
 
 #define GRAVE_ESC_CTRL_OVERRIDE
 
@@ -57,6 +57,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RGBLIGHT_SAT_STEP 17
 #define RGBLIGHT_VAL_STEP 17
 #define RGBLIGHT_LIMIT_VAL 128
+#define RGBLIGHT_LAYERS
+#define RGBLIGHT_DEFAULT_HUE 180
+#define RGBLIGHT_DEFAULT_SAT 200
+#define RGBLIGHT_DEFAULT_MODE RGBLIGHT_MODE_BREATHING
 
 /*
  * Feature disable options
