@@ -124,3 +124,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TAPPING_TERM 200
 #define IGNORE_MOD_TAP_INTERRUPT
 
+#define RGB_MATRIX_STARTUP_SAT 100
+#define RGB_MATRIX_STARTUP_HUE 180
+#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_BAND_SAT
