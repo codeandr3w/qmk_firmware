@@ -25,6 +25,7 @@
 
 /* number of backlight levels */
 #define BACKLIGHT_PIN B7
+#define BACKLIGHT_BREATHING
 #ifdef BACKLIGHT_PIN
 #    define BACKLIGHT_LEVELS 8
 #endif
@@ -44,6 +45,8 @@
 #define RGBLIGHT_HUE_STEP 8
 #define RGBLIGHT_SAT_STEP 8
 #define RGBLIGHT_VAL_STEP 8
+#define RGBLIGHT_LAYERS
+#define RGBLIGHT_LAYERS_OVERRIDE_RGB_OFF
 
 #define KEYBOARD_LOCK_ENABLE
 #define MAGIC_KEY_LOCK L
