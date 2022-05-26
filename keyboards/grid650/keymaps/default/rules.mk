@@ -52,7 +52,7 @@ OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 #   change yes to no to disable
 #
 BOOTMAGIC_ENABLE = lite       # Virtual DIP switch configuration
-EXTRAKEY_ENABLE = no       # Audio control and System control
+EXTRAKEY_ENABLE = yes       # Audio control and System control
 MOUSEKEY_ENABLE = yes       # Mouse keys
 # CONSOLE_ENABLE = yes        # Console for debug test
 CONSOLE_ENABLE = no        # Console for debug test
@@ -73,7 +73,7 @@ AUDIO_ENABLE = no           # Audio output
 FAUXCLICKY_ENABLE = no      # Use buzzer to emulate clicky switches
 HD44780_ENABLE = no         # Enable support for HD44780 based LCDs
 
-DEBOUNCE_TYPE = eager_pr
+DEBOUNCE_TYPE = sym_eager_pr
 CUSTOM_MATRIX    = yes
 
 # SRC += analog.c
