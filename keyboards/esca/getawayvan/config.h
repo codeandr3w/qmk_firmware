@@ -37,21 +37,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //#define BACKLIGHT_LEVELS 6
 
-#define GRAVE_ESC_CTRL_OVERRIDE
-
-/* define if matrix has ghost */
-//#define MATRIX_HAS_GHOST
-
 /* Set 0 if debouncing isn't needed */
 #define DEBOUNCE    5
 
-/* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
-//#define LOCKING_SUPPORT_ENABLE
-/* Locking resynchronize hack */
-//#define LOCKING_RESYNC_ENABLE
-
-#define RGBLIGHT_ANIMATIONS
+//RGB lighting/matrix configuration
 #define RGB_DI_PIN B15
+
+// RGB matrix configuration
+#define DRIVER_LED_TOTAL 51
+#define RGB_MATRIX_KEYPRESSES
+#define RGB_MATRIX_STARTUP_HUE 180
+#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_SPLASH
+
+//RGB Lighting configuration'
+#define RGBLIGHT_ANIMATIONS
 #define RGBLED_NUM 51
 #define RGBLIGHT_HUE_STEP 20
 #define RGBLIGHT_SAT_STEP 17
