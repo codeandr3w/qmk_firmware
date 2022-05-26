@@ -18,8 +18,10 @@ COMMAND_ENABLE = no    # Commands for debug and configuration
 SLEEP_LED_ENABLE = no  # Breathing sleep LED during USB suspend
 NKRO_ENABLE = yes     # USB Nkey Rollover
 AUDIO_ENABLE = no
-RGBLIGHT_ENABLE = no
 
+RGBLIGHT_ENABLE = yes
+#WS2812_DRIVER = pwm
+#RGB_MATRIX_ENABLE = no
 
 # Enter lower-power sleep mode when on the ChibiOS idle thread
 OPT_DEFS += -DCORTEX_ENABLE_WFI_IDLE=TRUE
