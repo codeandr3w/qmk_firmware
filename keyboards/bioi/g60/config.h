@@ -48,6 +48,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 /* Backlight Setup */
 #define BACKLIGHT_PIN B7
 #define BACKLIGHT_LEVELS 12
+#define BACKLIGHT_BREATHING
 
 /* COL2ROW or ROW2COL */
 #define DIODE_DIRECTION COL2ROW
