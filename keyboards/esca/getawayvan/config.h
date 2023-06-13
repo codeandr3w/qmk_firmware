@@ -43,6 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define LOCKING_RESYNC_ENABLE
 
 #define RGBLIGHT_ANIMATIONS
+#define RGBLIGHT_LAYERS
 #define RGB_DI_PIN B15
 #define RGBLED_NUM 51
 #define RGBLIGHT_HUE_STEP 20
