@@ -23,4 +23,5 @@ RGBLIGHT_ENABLE = yes       # Enable keyboard RGB underglow
 AUDIO_ENABLE = no           # Audio output
 LTO_ENABLE = yes            # Reduce firmware size
 
-VIA_ENABLE = yes            # VIA support should be enabled here due to the main() loop will be compiled first.
+VIA_ENABLE = no
+

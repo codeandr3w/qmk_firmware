@@ -11,10 +11,10 @@
 #define DIODE_DIRECTION COL2ROW
 
 /* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
-#define LOCKING_SUPPORT_ENABLE
+//#define LOCKING_SUPPORT_ENABLE
 
 /* Locking resynchronize hack */
-#define LOCKING_RESYNC_ENABLE
+//#define LOCKING_RESYNC_ENABLE
 
 #define RGB_DI_PIN B1
 #define RGBLIGHT_EFFECT_BREATHING
@@ -34,3 +34,6 @@
 
 #define KEYBOARD_LOCK_ENABLE
 #define MAGIC_KEY_LOCK L
+
+#define BACKLIGHT_BREATHING 1
+#define BREATHING_PERIOD 4
