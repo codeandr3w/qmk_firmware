@@ -13,8 +13,27 @@
     "features": {
         "bootmagic": true,
         "extrakey": true,
-        "mousekey": false,
-        "nkro": true
+        "mousekey": true,
+        "nkro": true,
+	"rgblight": true,
+	"rgb_matrix": false
+    },
+    "rgblight": {
+	    "led_count": 4,
+	    "driver": "ws2812",
+        "animations": {
+            "breathing": true
+        },
+	    "layers": {
+    	    "enabled": true
+    	},
+        "default": {
+            "animation": "breathing",
+            "val": 32
+        }
+    },
+    "ws2812": {
+	"pin": "A14"
     },
     "matrix_pins": {
         "cols": ["A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "B0", "B1", "B2", "B10", "B11", "B12", "B13", "B14", "B15"],
