@@ -21,10 +21,10 @@ void led_init_ports(void) {
     gpio_set_pin_output_open_drain(LED_NUM_LOCK_PIN);
     gpio_set_pin_output_open_drain(LED_SCROLL_LOCK_PIN);
     gpio_set_pin_output_open_drain(LED_KANA_PIN);
-    gpio_set_pin_output_open_drain(A14);
+    gpio_set_pin_output_open_drain(B3);
 }
 
 layer_state_t layer_state_set_kb(layer_state_t state) {
-    gpio_write_pin(A14, !layer_state_cmp(state, 1));
+    gpio_write_pin(B3, !layer_state_cmp(state, 1));
     return layer_state_set_user(state);
 }
