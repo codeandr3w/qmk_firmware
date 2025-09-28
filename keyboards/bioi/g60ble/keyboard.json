@@ -15,7 +15,8 @@
         "command": true,
         "backlight": true,
         "rgblight": true,
-        "bluetooth": true
+        "bluetooth": true,
+        "indicators": true
     },
     "build": {
         "lto": true
@@ -33,7 +34,17 @@
     "diode_direction": "COL2ROW",
     "backlight": {
         "pin": "B7",
-        "levels": 8
+        "levels": 8,
+        "breathing": true,
+        "breathing_period": 8,
+        "default": {
+            "on": false,
+            "breathing": true
+        }
+    },
+    "indicators": {
+        "caps_lock": "F0",
+        "on_state": 0
     },
     "rgblight": {
         "saturation_steps": 8,
